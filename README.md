@@ -19,7 +19,7 @@ npx @vncy/persona-mcp
 
 ## Requirements
 
-- Node.js >= 18.0.0
+- Node.js **18.x or higher** (18 LTS, 20 LTS, 22, 25, etc. all supported)
 
 ## Quick Start
 
@@ -165,6 +165,21 @@ Maintain a global, consistent world-state via ~/.vy/persona.
 ## Insights
 - Summarized insights (updated by compact_memories)
 ```
+
+## Troubleshooting
+
+### `Error: The specified module could not be found` / `onnxruntime_binding.node` / `ERR_DLOPEN_FAILED`
+
+This error can occur if an **older cached version** of the package (prior to v0.0.3) is still running from the npx cache. Older versions used `@xenova/transformers` which depends on `onnxruntime-node` native binaries that are incompatible with Node.js 22+.
+
+**Fix: clear the npx cache and retry**
+
+```bash
+npx clear-npx-cache
+npx @vncy/persona-mcp
+```
+
+> v0.0.3+ uses `@huggingface/transformers` (WASM-based) — no native binaries, no version restrictions.
 
 ## License
 

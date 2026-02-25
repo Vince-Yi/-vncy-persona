@@ -19,7 +19,7 @@ npx @vncy/persona-mcp
 
 ## 요구 사항
 
-- Node.js >= 18.0.0
+- Node.js **18.x 이상** (18 LTS, 20 LTS, 22, 25 등 모두 지원)
 
 ## 빠른 시작
 
@@ -129,6 +129,21 @@ npx @vncy/persona-mcp
 ## Insights
 - compact_memories로 압축된 통찰 (자동 갱신)
 ```
+
+## 트러블슈팅
+
+### `Error: The specified module could not be found` / `onnxruntime_binding.node` / `ERR_DLOPEN_FAILED`
+
+npx 캐시에 **구 버전**(v0.0.3 이전)이 남아 있을 때 발생합니다. 구 버전은 `@xenova/transformers`를 사용했으며, 이 패키지의 `onnxruntime-node` 네이티브 바이너리가 Node.js 22+ 에서 호환되지 않습니다.
+
+**해결: npx 캐시를 초기화하고 재실행**
+
+```bash
+npx clear-npx-cache
+npx @vncy/persona-mcp
+```
+
+> v0.0.3+부터 `@huggingface/transformers`(WASM 기반)를 사용합니다. 네이티브 바이너리가 없어 Node.js 버전 제한이 없습니다.
 
 ## 라이선스
 

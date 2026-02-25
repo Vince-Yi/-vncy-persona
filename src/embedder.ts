@@ -1,4 +1,4 @@
-import { pipeline, type FeatureExtractionPipeline } from "@xenova/transformers";
+import { pipeline, FeatureExtractionPipeline } from "@huggingface/transformers";
 
 const MODEL_NAME = "Xenova/all-MiniLM-L6-v2";
 const EMBEDDING_DIM = 384;
@@ -10,9 +10,13 @@ let _extractor: FeatureExtractionPipeline | null = null;
  */
 export async function preloadModel(): Promise<void> {
     if (_extractor) return;
-    _extractor = await pipeline("feature-extraction", MODEL_NAME, {
-        quantized: true,
-    });
+    // @huggingface/transformers v3의 pipeline 반환 타입이 너무 복잡해 직접 단언
+    const load = pipeline as unknown as (
+        task: string,
+        model: string,
+        opts?: Record<string, unknown>
+    ) => Promise<FeatureExtractionPipeline>;
+    _extractor = await load("feature-extraction", MODEL_NAME, { dtype: "q8" });
 }
 
 async function getExtractor(): Promise<FeatureExtractionPipeline> {
