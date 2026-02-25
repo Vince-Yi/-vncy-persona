@@ -1,6 +1,6 @@
 {
     "name": "@vncy/persona-mcp",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Global Persona & Relationship Vault MCP server",
     "type": "module",
     "bin": {
