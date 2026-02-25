@@ -1,6 +1,6 @@
 {
     "name": "@vncy/persona-mcp",
-    "version": "1.0.0",
+    "version": "0.0.2",
     "description": "Global Persona & Relationship Vault MCP server",
     "type": "module",
     "bin": {
@@ -32,5 +32,13 @@
     },
     "publishConfig": {
         "access": "public"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Vince-Yi/-vncy-persona.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Vince-Yi/-vncy-persona/issues"
+    },
+    "homepage": "https://github.com/Vince-Yi/-vncy-persona#readme"
 }

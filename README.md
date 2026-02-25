@@ -23,7 +23,24 @@ npx @vncy/persona-mcp
 
 ## Quick Start
 
-1. Add the MCP server to your Cursor/Claude Desktop config:
+1. Install the package (see [Installation](#installation)).
+2. Add the server to your MCP config (see [MCP Setup](#mcp-setup)).
+3. Set `PERSONA_PATH` (optional) to customize storage location. Default: `~/.vy/persona`
+
+## MCP Setup
+
+Register the server in your MCP config file (`mcp.json` or the app’s MCP settings).
+
+### Config file location
+
+| Client | Config path |
+|--------|-------------|
+| **Cursor** | `.cursor/mcp.json` (project) or **Cursor Settings → MCP → Edit Config** |
+| **Claude Desktop** | `%APPDATA%\Claude\claude_desktop_config.json` (Windows) / `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) |
+
+### What to add to `mcp.json`
+
+Add a `mcpServers` entry (or merge into existing `mcpServers`):
 
 ```json
 {
@@ -36,7 +53,26 @@ npx @vncy/persona-mcp
 }
 ```
 
-2. Set `PERSONA_PATH` (optional) to customize storage location. Default: `~/.vy/persona`
+If you use a custom persona path, pass it via `env`:
+
+```json
+{
+  "mcpServers": {
+    "persona-mcp": {
+      "command": "npx",
+      "args": ["@vncy/persona-mcp"],
+      "env": {
+        "PERSONA_PATH": "G:/My Drive/vy-persona"
+      }
+    }
+  }
+}
+```
+
+- **`persona-mcp`**: Server name (you can change it; this is the label in the client).
+- **`command`**: `npx` so the package runs without a global install.
+- **`args`**: `["@vncy/persona-mcp"]` — the package to run.
+- **`env`** (optional): `PERSONA_PATH` for a custom storage directory (e.g. Google Drive).
 
 ## Storage Structure
 
