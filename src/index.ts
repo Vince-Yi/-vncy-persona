@@ -25,7 +25,7 @@ async function main() {
 
 동작:
 1. profiles/{name}.md 의 정적 프로필을 읽어 핵심 정체성 및 지침 제공.
-2. memory.db의 vss_events를 벡터 유사도 검색하여 해당 인물의 최근 관련 사건 최대 5건 추출.
+2. memory.db의 events 테이블에서 코사인 유사도 검색으로 해당 인물의 최근 관련 사건 최대 5건 추출.
 3. relationships 테이블에서 해당 인물이 주체 또는 대상인 모든 관계를 조회.
 
 호출 시점:
@@ -49,8 +49,7 @@ async function main() {
 
 동작:
 1. content를 all-MiniLM-L6-v2 모델로 벡터화(384차원).
-2. events 테이블에 사건 레코드 삽입.
-3. vss_events 테이블에 임베딩을 삽입하여 이후 유사도 검색 대상으로 등록.
+2. events 테이블에 사건 레코드(embedding 포함) 삽입.
 
 호출 시점:
 - 대화 중 특정 인물에 관한 새로운 정보를 알게 된 즉시 호출.
@@ -118,8 +117,9 @@ async function main() {
 1. events 테이블에서 해당 인물의 모든 사건 기록을 조회.
 2. 핵심 통찰 불릿 목록 생성 (중복 제거 후 최대 20개).
 3. profiles/{name}.md의 ## Insights 섹션을 새 요약으로 갱신.
-4. 압축된 원본 이벤트를 events 및 vss_events에서 삭제.
-5. WAL 체크포인트를 실행하여 동기화용 DB 파일 정리.
+4. 압축된 원본 이벤트를 events 테이블에서 삭제.
+5. VACUUM으로 DB 파일 크기 실제 축소.
+6. WAL 체크포인트를 실행하여 동기화용 DB 파일 정리.
 
 호출 시점:
 - get_persona_context 반환 결과가 과도하게 길거나 중복 내용이 많을 때.

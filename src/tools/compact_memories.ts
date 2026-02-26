@@ -45,7 +45,10 @@ export function compactMemories(name: string): string {
     const placeholders = ids.map(() => "?").join(",");
     db.run(`DELETE FROM events WHERE id IN (${placeholders})`, ids);
 
-    // 5. WAL 체크포인트 플러시 (node-sqlite3-wasm 지원 범위 내)
+    // 5. VACUUM으로 삭제된 페이지 공간 회수 (파일 크기 실제 축소)
+    db.exec("VACUUM");
+
+    // 6. WAL 체크포인트 플러시 (node-sqlite3-wasm 지원 범위 내)
     try {
         db.exec("PRAGMA wal_checkpoint(FULL)");
     } catch {
