@@ -132,15 +132,17 @@ When the user says "let's play image game" or similar:
 3. **Interview**: Ask scenario-based questions (e.g., "If A were a programming language, C++ or JS?")
 4. **Record**: Save every answer with `record_persona_event`; use `link_personas` when relationships emerge
 
-## Agent Guidelines
+## Agent Guidelines (required for persona aggregation)
 
-Add to your system prompt or `.cursorrules`:
+Installing the MCP alone is **not enough**. Agents do not automatically call the tools; without explicit instructions, persona data will not be gathered or updated consistently. Add the following to your system prompt, Cursor rules (e.g. `.cursor/rules` or project rules), or equivalent so that the agent is **required** to use the tools.
+
+**Add to your system prompt or `.cursorrules` / Cursor Rules:**
 
 ```markdown
 # MISSION: @vncy/persona-mcp Manager
-Maintain a global, consistent world-state via ~/.vy/persona.
+Maintain a global, consistent world-state only through persona-mcp tools (get_persona_context, record_persona_event, link_personas, compact_memories). Do not read or write the storage path directly.
 
-# PROTOCOLS
+# PROTOCOLS (enforce these or persona aggregation will be poor)
 1. **Retrieval**: Always call get_persona_context when a person (or "@me") is mentioned.
 2. **Learning**: Call record_persona_event for new facts. Use link_personas to map social/work hierarchies.
 3. **Compaction**: Proactively call compact_memories to keep the DB lean for Google Drive sync.

@@ -93,15 +93,17 @@ npx @vncy/persona-mcp
 3. **인터뷰**: 시나리오 기반 질문 (예: "A를 프로그래밍 언어에 비유하면 C++인가요, JS인가요?")
 4. **반영**: 모든 답변을 `record_persona_event`로 저장; 관계가 드러나면 `link_personas` 호출
 
-## 에이전트 전역 지침
+## 에이전트 전역 지침 (페르소나 취합을 위해 필수)
 
-시스템 프롬프트 또는 `.cursorrules`에 추가:
+MCP만 설치해서는 **부족하다**. 에이전트가 도구를 자동으로 호출하지 않으며, 지침 없이는 페르소나가 일관되게 수집·갱신되지 않는다. 시스템 프롬프트, Cursor 규칙(예: `.cursor/rules` 또는 프로젝트 규칙) 등에 아래 내용을 넣어, 에이전트가 **반드시** 해당 도구를 사용하도록 하라.
+
+**시스템 프롬프트 또는 `.cursorrules` / Cursor 규칙에 추가:**
 
 ```markdown
 # MISSION: @vncy/persona-mcp Manager
-~/.vy/persona를 통해 전역적·일관된 세계관을 유지하라.
+전역적·일관된 세계관은 반드시 persona-mcp 도구(get_persona_context, record_persona_event, link_personas, compact_memories)만 사용하여 유지하라. 저장 경로를 직접 건드리지 말 것.
 
-# PROTOCOLS
+# PROTOCOLS (미준수 시 페르소나 취합이 잘 되지 않음)
 1. **Retrieval**: 인물(또는 "@me") 언급 시 항상 get_persona_context 호출.
 2. **Learning**: 새 사실은 record_persona_event, 관계는 link_personas로 기록.
 3. **Compaction**: 구글 드라이브 동기화를 위해 compact_memories를 선제적으로 호출.
