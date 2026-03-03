@@ -115,8 +115,11 @@ Defines or updates a relationship between two people.
 
 ### compact_memories(name)
 
-Summarizes fragmented vector memories into `profiles/{name}.md` and removes original events from DB.
+Consolidates fragmented vector memories into `profiles/{name}.md` and removes original events from DB.
 
+- Merges DB events → `## Insights` (new events first, then existing insights; dedup + top 20)
+- Writes DB relationships → `## Relationships` (full snapshot; overwrites on each compact)
+- Runs VACUUM + WAL checkpoint to shrink DB file size
 - Use when context is too long or redundant
 - Recommended before cloud sync to reduce DB size
 
@@ -164,6 +167,9 @@ Maintain a global, consistent world-state via ~/.vy/persona.
 
 ## Insights
 - Summarized insights (updated by compact_memories)
+
+## Relationships
+- Relationship snapshot (updated by compact_memories)
 ```
 
 ## Troubleshooting

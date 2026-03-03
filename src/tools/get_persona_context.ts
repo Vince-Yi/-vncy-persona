@@ -39,14 +39,7 @@ export async function getPersonaContext(name: string): Promise<string> {
         .sort((a, b) => b.score - a.score)
         .slice(0, 5);
 
-    // 3. 관계망 조회
-    const relationships = db.all(
-        `SELECT source_name, target_name, relation_type, description
-         FROM relationships WHERE source_name = ? OR target_name = ?`,
-        [resolvedName, resolvedName]
-    ) as unknown as RelationshipRow[];
-
-    // 4. 통합 텍스트 조합
+    // 3. 통합 텍스트 조합
     const sections: string[] = [];
 
     sections.push("[프로필]");
@@ -61,15 +54,28 @@ export async function getPersonaContext(name: string): Promise<string> {
         }
     }
 
+    // 4. 관계망: md에 ## Relationships 있으면 md 우선, 없으면 DB 조회
     sections.push("\n[관계망]");
-    if (relationships.length === 0) {
-        sections.push("- (등록된 관계 없음)");
+    if (profileContent.includes("## Relationships")) {
+        const relMatch = profileContent.match(/## Relationships\n([\s\S]*?)(?:\n##|$)/);
+        const relContent = relMatch ? relMatch[1].trim() : "";
+        sections.push(relContent || "- (등록된 관계 없음)");
     } else {
-        for (const rel of relationships) {
-            const desc = rel.description ? ` (${rel.description})` : "";
-            sections.push(
-                `- ${rel.source_name} → ${rel.target_name}: ${rel.relation_type}${desc}`
-            );
+        const relationships = db.all(
+            `SELECT source_name, target_name, relation_type, description
+             FROM relationships WHERE source_name = ? OR target_name = ?`,
+            [resolvedName, resolvedName]
+        ) as unknown as RelationshipRow[];
+
+        if (relationships.length === 0) {
+            sections.push("- (등록된 관계 없음)");
+        } else {
+            for (const rel of relationships) {
+                const desc = rel.description ? ` (${rel.description})` : "";
+                sections.push(
+                    `- ${rel.source_name} → ${rel.target_name}: ${rel.relation_type}${desc}`
+                );
+            }
         }
     }
 
