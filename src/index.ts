@@ -7,6 +7,7 @@ import { getPersonaContext } from "./tools/get_persona_context.js";
 import { recordPersonaEvent } from "./tools/record_persona_event.js";
 import { linkPersonas } from "./tools/link_personas.js";
 import { compactMemories } from "./tools/compact_memories.js";
+import { summonAntiPersona } from "./tools/summon_anti_persona.js";
 
 async function main() {
     // 초기화: DB 연결 및 임베딩 모델 사전 로딩
@@ -105,6 +106,30 @@ async function main() {
         async ({ source, target, relation_type, description }) => {
             const result = linkPersonas(source, target, relation_type, description);
             return { content: [{ type: "text", text: result }] };
+        }
+    );
+
+    // ── summon_anti_persona ──────────────────────────────────────────────────
+    server.tool(
+        "summon_anti_persona",
+        `특정 인물과 동일한 나이·사회적 위치·환경을 가지지만, 성격·가치관이 정반대인 가상의 새 인물을 즉석 소환합니다.
+
+동작:
+1. profiles/{name}.md 를 읽어 원본 프로필을 로드.
+2. 소환 지침과 함께 원본 프로필을 반환. LLM이 이를 바탕으로 반대 성격의 독립된 가상 인물을 구성함.
+3. 프로필이 없으면 등록 안내 메시지 반환.
+
+호출 시점:
+- 사용자의 발화 맥락상 안티 페르소나 소환이 적절하다고 판단될 때.
+
+주의:
+- 소환된 인물은 {name} 본인이 아니라 독립된 가상 인물임. 기존 페르소나는 일시 중단됨.
+- '@me'는 사용자 본인(profiles/me.md)을 의미함.
+- 별도 저장 데이터 없이 원본 프로필만으로 동작함.`,
+        { name: z.string().describe("안티 페르소나를 소환할 원본 인물명. '@me'는 본인.") },
+        async ({ name }) => {
+            const text = summonAntiPersona(name);
+            return { content: [{ type: "text", text }] };
         }
     );
 

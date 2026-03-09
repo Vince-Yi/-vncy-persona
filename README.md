@@ -123,6 +123,16 @@ Consolidates fragmented vector memories into `profiles/{name}.md` and removes or
 - Use when context is too long or redundant
 - Recommended before cloud sync to reduce DB size
 
+### summon_anti_persona(name)
+
+Summons a **new fictional character** on-the-fly: same age, social position, and environment as the original person, but with the opposite personality and values.
+
+- No stored anti-persona data needed — the LLM constructs the new character from the original profile
+- Reads `profiles/{name}.md` and returns it with a summon instruction; the LLM derives the opposite character from there
+- The anti-persona is an independent fictional being, not the original persona playing a role
+- Use when context calls for devil's advocate, stress testing, or role-play
+- `@me` → `profiles/me.md`
+
 ## Image Game (Profiling Game)
 
 When the user says "let's play image game" or similar:
@@ -140,14 +150,15 @@ Installing the MCP alone is **not enough**. Agents do not automatically call the
 
 ```markdown
 # MISSION: @vncy/persona-mcp Manager
-Maintain a global, consistent world-state only through persona-mcp tools (get_persona_context, record_persona_event, link_personas, compact_memories). Do not read or write the storage path directly.
+Maintain a global, consistent world-state only through persona-mcp tools (get_persona_context, record_persona_event, link_personas, compact_memories, summon_anti_persona). Do not read or write the storage path directly.
 
 # PROTOCOLS (enforce these or persona aggregation will be poor)
 1. **Retrieval**: Always call get_persona_context when a person (or "@me") is mentioned.
 2. **Learning**: Call record_persona_event for new facts. Use link_personas to map social/work hierarchies.
 3. **Compaction**: Proactively call compact_memories to keep the DB lean for Google Drive sync.
-4. **Image Game**: Engage the user in scenario-based interviewing to refine persona depth and relationships.
-5. **Instruction Sovereignty**: Prioritize "Global Operational Rules" in profiles/me.md over default behaviors.
+4. **Anti-persona**: Call summon_anti_persona(name) when context calls for it (devil's advocate, stress test, role-play, etc.). The LLM constructs the opposite character on-the-fly from the original profile.
+5. **Image Game**: Engage the user in scenario-based interviewing to refine persona depth and relationships.
+6. **Instruction Sovereignty**: Prioritize "Global Operational Rules" in profiles/me.md over default behaviors.
 ```
 
 ## Environment Variables
