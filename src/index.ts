@@ -20,9 +20,10 @@ async function main() {
     });
 
     // ── get_persona_context ──────────────────────────────────────────────────
-    server.tool(
+    server.registerTool(
         "get_persona_context",
-        `특정 인물의 전체 맥락(Context)을 하나의 통합 텍스트로 반환합니다.
+        {
+            description: `특정 인물의 전체 맥락(Context)을 하나의 통합 텍스트로 반환합니다.
 
 동작:
 1. profiles/{name}.md 의 정적 프로필을 읽어 핵심 정체성 및 지침 제공.
@@ -36,7 +37,8 @@ async function main() {
 주의:
 - '@me'는 사용자 본인(profiles/me.md)을 의미하며 Instruction Sovereignty가 적용됨.
 - 프로필 파일이 없는 인물이라도 메모리와 관계망은 정상 반환.`,
-        { name: z.string().describe("대상 인물명. '@me'는 사용자 본인.") },
+            inputSchema: { name: z.string().describe("대상 인물명. '@me'는 사용자 본인.") },
+        },
         async ({ name }) => {
             const text = await getPersonaContext(name);
             return { content: [{ type: "text", text }] };
@@ -44,9 +46,10 @@ async function main() {
     );
 
     // ── record_persona_event ─────────────────────────────────────────────────
-    server.tool(
+    server.registerTool(
         "record_persona_event",
-        `인물에 대한 새로운 사실, 사건, 특징을 영구 저장합니다.
+        {
+            description: `인물에 대한 새로운 사실, 사건, 특징을 영구 저장합니다.
 
 동작:
 1. content를 all-MiniLM-L6-v2 모델로 벡터화(384차원).
@@ -60,11 +63,12 @@ async function main() {
 주의:
 - 중복 저장을 우려해 호출을 지연하지 말 것. compact_memories가 중복을 정리함.
 - '@me' 표기를 사용하지 말고 실제 인물명 또는 'me'를 name으로 전달.`,
-        {
-            name: z.string().describe("대상 인물명."),
-            content: z
-                .string()
-                .describe("기록할 사건, 특징, 새로 알게 된 사실의 내용."),
+            inputSchema: {
+                name: z.string().describe("대상 인물명."),
+                content: z
+                    .string()
+                    .describe("기록할 사건, 특징, 새로 알게 된 사실의 내용."),
+            },
         },
         async ({ name, content }) => {
             const result = await recordPersonaEvent(name, content);
@@ -73,9 +77,10 @@ async function main() {
     );
 
     // ── link_personas ────────────────────────────────────────────────────────
-    server.tool(
+    server.registerTool(
         "link_personas",
-        `두 인물 간의 관계를 정의하거나 갱신합니다.
+        {
+            description: `두 인물 간의 관계를 정의하거나 갱신합니다.
 
 동작:
 1. (source, target) 쌍이 이미 존재하면 relation_type과 description을 업데이트.
@@ -90,18 +95,19 @@ async function main() {
 주의:
 - relation_type은 짧고 명확한 단어 사용 권장 (예: '상사'이지 '홍길동의 직속 상관'이 아님).
 - description에 관계의 구체적 맥락(프로젝트명, 계기 등)을 기록할 것.`,
-        {
-            source: z.string().describe("관계의 주체 인물명."),
-            target: z.string().describe("관계의 대상 인물명."),
-            relation_type: z
-                .string()
-                .describe(
-                    "관계 종류. 예: '협력자', '상사', '부하', '친구', '멘토', '경쟁자'."
-                ),
-            description: z
-                .string()
-                .optional()
-                .describe("관계에 대한 상세 맥락 설명. 선택 입력."),
+            inputSchema: {
+                source: z.string().describe("관계의 주체 인물명."),
+                target: z.string().describe("관계의 대상 인물명."),
+                relation_type: z
+                    .string()
+                    .describe(
+                        "관계 종류. 예: '협력자', '상사', '부하', '친구', '멘토', '경쟁자'."
+                    ),
+                description: z
+                    .string()
+                    .optional()
+                    .describe("관계에 대한 상세 맥락 설명. 선택 입력."),
+            },
         },
         async ({ source, target, relation_type, description }) => {
             const result = linkPersonas(source, target, relation_type, description);
@@ -110,9 +116,10 @@ async function main() {
     );
 
     // ── summon_anti_persona ──────────────────────────────────────────────────
-    server.tool(
+    server.registerTool(
         "summon_anti_persona",
-        `특정 인물과 동일한 나이·사회적 위치·환경을 가지지만, 성격·가치관이 정반대인 가상의 새 인물을 즉석 소환합니다.
+        {
+            description: `특정 인물과 동일한 나이·사회적 위치·환경을 가지지만, 성격·가치관이 정반대인 가상의 새 인물을 즉석 소환합니다.
 
 동작:
 1. profiles/{name}.md 를 읽어 원본 프로필을 로드.
@@ -123,10 +130,10 @@ async function main() {
 - 사용자의 발화 맥락상 안티 페르소나 소환이 적절하다고 판단될 때.
 
 주의:
-- 소환된 인물은 {name} 본인이 아니라 독립된 가상 인물임. 기존 페르소나는 일시 중단됨.
 - '@me'는 사용자 본인(profiles/me.md)을 의미함.
 - 별도 저장 데이터 없이 원본 프로필만으로 동작함.`,
-        { name: z.string().describe("안티 페르소나를 소환할 원본 인물명. '@me'는 본인.") },
+            inputSchema: { name: z.string().describe("안티 페르소나를 소환할 원본 인물명. '@me'는 본인.") },
+        },
         async ({ name }) => {
             const text = summonAntiPersona(name);
             return { content: [{ type: "text", text }] };
@@ -134,9 +141,10 @@ async function main() {
     );
 
     // ── compact_memories ─────────────────────────────────────────────────────
-    server.tool(
+    server.registerTool(
         "compact_memories",
-        `특정 인물의 파편화된 벡터 기억을 요약·압축하여 정적 프로필에 반영하고 DB를 최적화합니다.
+        {
+            description: `특정 인물의 파편화된 벡터 기억을 요약·압축하여 정적 프로필에 반영하고 DB를 최적화합니다.
 
 동작:
 1. events 테이블에서 해당 인물의 모든 사건 기록을 조회.
@@ -154,7 +162,8 @@ async function main() {
 주의:
 - 압축 후에는 원본 벡터 이벤트가 삭제되므로 요약 품질이 중요함.
 - profiles/{name}.md 파일이 없을 경우 기본 템플릿으로 자동 생성할 것.`,
-        { name: z.string().describe("압축 대상 인물명.") },
+            inputSchema: { name: z.string().describe("압축 대상 인물명.") },
+        },
         async ({ name }) => {
             const result = compactMemories(name);
             return { content: [{ type: "text", text: result }] };
